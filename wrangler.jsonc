@@ -9,7 +9,7 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "my-emdash-site","database_id": "97154422-719b-4661-90ee-2cd7ba2dab65",
+			"database_name": "my-emdash-site","database_id": "b59099f5-2bba-4a92-ade3-c0878a599553",
 			// Run `wrangler d1 create my-emdash-site` and paste the ID here
 		},
 	],
