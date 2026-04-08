@@ -1,0 +1,28 @@
+diff --git a/node_modules/emdash/src/astro/routes/api/auth/oauth/[provider].ts b/node_modules/emdash/src/astro/routes/api/auth/oauth/[provider].ts
+index d8150d5..f20575f 100644
+--- a/node_modules/emdash/src/astro/routes/api/auth/oauth/[provider].ts
++++ b/node_modules/emdash/src/astro/routes/api/auth/oauth/[provider].ts
+@@ -86,12 +86,18 @@ export const GET: APIRoute = async ({ params, request, locals, redirect }) => {
+ 	try {
+ 		const url = new URL(request.url);
+ 
+-		// Get OAuth providers from environment
+-		// Access via locals.runtime for Cloudflare, or import.meta.env for Node
+-		// eslint-disable-next-line typescript-eslint(no-unsafe-type-assertion) -- locals.runtime is injected by the Cloudflare adapter at runtime; not declared on App.Locals since the adapter is optional
+-		const runtimeLocals = locals as unknown as { runtime?: { env?: Record<string, unknown> } };
++		// Get OAuth providers from environment.
++		// In Astro v6, direct access to locals.runtime may throw.
+ 		// eslint-disable-next-line typescript-eslint(no-unsafe-type-assertion) -- import.meta.env is typed as ImportMetaEnv but we need Record<string, unknown> for getOAuthConfig
+-		const env = runtimeLocals.runtime?.env ?? (import.meta.env as Record<string, unknown>);
++		let env = import.meta.env as Record<string, unknown>;
++		try {
++			const runtime = Reflect.get(locals as object, "runtime") as
++				| { env?: Record<string, unknown> }
++				| undefined;
++			if (runtime?.env) env = runtime.env;
++		} catch {
++			// Fall back to import.meta.env when adapter runtime is unavailable.
++		}
+ 		const providers = getOAuthConfig(env);
+ 
+ 		if (!providers[provider]) {
